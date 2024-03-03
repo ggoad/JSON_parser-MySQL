@@ -1,0 +1,27 @@
+DELIMITER $$
+CREATE PROCEDURE `GET_realValAndType` (IN `p` BIGINT UNSIGNED, OUT `rv` TEXT, OUT `t` TEXT)  
+BEGIN 
+	SELECT type, val INTO t,rv FROM vals WHERE pk=p LIMIT 1;
+END$$
+
+CREATE PROCEDURE `GET_serValAndType` (IN `pk` BIGINT UNSIGNED, OUT `sv` TEXT, OUT `t` TEXT)  
+BEGIN
+	CALL SERIALIZE(pk, sv);
+	SELECT type INTO t FROM vals WHERE pk = pk; 
+END$$
+
+
+
+CREATE FUNCTION `IS_whitespace` (`operand` CHAR(1)) RETURNS TINYINT(1) UNSIGNED 
+BEGIN
+	RETURN (operand IN (' ','\r','\n','\t'));
+END$$
+
+CREATE FUNCTION `ltrm` (`t` TEXT) RETURNS TEXT CHARSET latin1 
+BEGIN
+	WHILE t IS NOT NULL AND LENGTH(t) > 0 AND IS_whitespace(LEFT(t,1)) DO
+		SET t= SUBSTRING(t,2);
+	END WHILE;
+	RETURN t;
+END$$
+
